@@ -15,22 +15,37 @@ export default function HomeScreen() {
 
   const fetchWebviewUrl = async () => {
     try {
-      const apiUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/get-webview-url`;
-      const headers = {
-        'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-      };
+      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
-      const response = await fetch(apiUrl, { headers });
+      console.log("SUPABASE_URL:", supabaseUrl);
+      console.log("SUPABASE_ANON_KEY:", supabaseKey ? "✅ Present" : "❌ MISSING");
+
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error("Supabase environment variables missing");
+      }
+
+      const apiUrl = `${supabaseUrl}/functions/v1/get-webview-url`;
+      console.log("Fetching from:", apiUrl);
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
       const data = await response.json();
+      console.log("Supabase Response:", data);
 
       if (data.url) {
         setWebviewUrl(data.url);
       } else {
         setWebviewUrl(null);
       }
-    } catch (err) {
-      console.error('Error fetching webview URL:', err);
+    } catch (err: any) {
+      console.error('Error fetching webview URL:', err.message || err);
       setError('Failed to fetch URL');
       setWebviewUrl(null);
     } finally {
@@ -68,7 +83,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#000',
-    paddingTop: Platform.OS === 'android' ? 25 : 0,
+    paddingTop: Platform.OS === 'android' ? 45 : 0,
   },
   contentContainer: {
     flex: 1,

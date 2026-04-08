@@ -34,11 +34,9 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
 
   const progress = useSharedValue(0);
 
-  const progressBarStyle = useAnimatedStyle(() => {
-    return {
-      width: `${progress.value * 100}%`,
-    };
-  });
+  const progressBarStyle = useAnimatedStyle(() => ({
+    width: `${progress.value * 100}%`,
+  }));
 
   const handleNavigationStateChange = (navState: WebViewNavigation) => {
     setCanGoBack(navState.canGoBack);
@@ -96,12 +94,9 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
 
   const handleShare = async () => {
     try {
-      await Share.share({
-        message: currentUrl,
-        url: currentUrl,
-      });
-    } catch (error) {
-      console.error('Error sharing:', error);
+      await Share.share({ message: currentUrl, url: currentUrl });
+    } catch (e) {
+      console.error('Error sharing:', e);
     }
   };
 
@@ -139,9 +134,7 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
       <View style={styles.errorContainer}>
         <AlertCircle size={64} color="#ff4444" />
         <Text style={styles.errorTitle}>Connection Error</Text>
-        <Text style={styles.errorMessage}>
-          Unable to load the page. Please check your internet connection.
-        </Text>
+        <Text style={styles.errorMessage}>Unable to load the page. Please check your internet connection.</Text>
         <TouchableOpacity style={styles.retryButton} onPress={handleRetry}>
           <RotateCw size={20} color="#fff" />
           <Text style={styles.retryText}>Retry</Text>
@@ -179,14 +172,14 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
             onError={handleError}
             injectedJavaScript={injectedJavaScript}
             startInLoadingState={true}
-            renderLoading={() => (
-              <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#007AFF" />
-                <Text style={styles.loadingText}>Loading...</Text>
-              </View>
-            )}
+            // renderLoading={() => (
+            //   <View style={styles.loadingContainer}>
+            //     <ActivityIndicator size="large" color="#007AFF" />
+            //     <Text style={styles.loadingText}>Loading...</Text>
+            //   </View>
+            // )}
             allowsBackForwardNavigationGestures
-            decelerationRate="normal"
+            // decelerationRate="normal"
             bounces={true}
             javaScriptEnabled={true}
             domStorageEnabled={true}
@@ -202,6 +195,7 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
         </View>
       </ScrollView>
 
+      {/* Navigation Bar */}
       <View style={styles.navigationBar}>
         <TouchableOpacity
           style={[styles.navButton, !canGoBack && styles.navButtonDisabled]}
