@@ -4,10 +4,15 @@
     "slug": "smarty-gym-webview",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/SmartyGym_Logo.png",
     "scheme": "smartygym",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/SmartyGym_Logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.smartygym.webview"
@@ -15,7 +20,7 @@
     "android": {
       "package": "com.smartygym.webview",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/icon.png",
+        "foregroundImage": "./assets/images/SmartyGym_Logo.png",
         "backgroundColor": "#ffffff"
       }
     },
