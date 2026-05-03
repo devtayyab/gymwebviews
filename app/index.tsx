@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { StyleSheet, View, SafeAreaView, Platform, ActivityIndicator, Text } from 'react-native';
+import { StyleSheet, View, SafeAreaView, Platform, ActivityIndicator, Text, Image } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import AdvancedWebView from '@/components/AdvancedWebView';
 import Calculator from '@/components/Calculator';
@@ -8,9 +8,16 @@ export default function HomeScreen() {
   const [webviewUrl, setWebviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSplashImage, setShowSplashImage] = useState(true);
 
   useEffect(() => {
     fetchWebviewUrl();
+    
+    const timer = setTimeout(() => {
+      setShowSplashImage(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const fetchWebviewUrl = async () => {
@@ -52,6 +59,18 @@ export default function HomeScreen() {
       setLoading(false);
     }
   };
+
+  if (showSplashImage) {
+    return (
+      <View style={styles.fullScreenSplashContainer}>
+        <StatusBar style="light" />
+        <Image 
+          source={require('../assets/smarty-gym/splash screens/14-15-pro-max.jpg')} 
+          style={styles.fullScreenSplashImage} 
+        />
+      </View>
+    );
+  }
 
   if (loading) {
     return (
@@ -98,4 +117,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#fff',
   },
+  fullScreenSplashContainer: {
+    flex: 1,
+    backgroundColor: '#000',
+  },
+  fullScreenSplashImage: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
 });
+
