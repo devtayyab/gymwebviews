@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   Platform,
   Share,
+  BackHandler,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type { WebViewNavigation, WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
@@ -31,6 +32,24 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [isAtTop, setIsAtTop] = useState(true);
+
+  useEffect(() => {
+    const backAction = () => {
+      if (canGoBack && webViewRef.current) {
+        webViewRef.current.goBack();
+        return true;
+      }
+      return false;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+
+    return () => backHandler.remove();
+  }, [canGoBack]);
 
   const progress = useSharedValue(0);
 
@@ -155,6 +174,7 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={handleRefresh}
+            enabled={isAtTop}
             tintColor="#007AFF"
             colors={['#007AFF']}
           />
@@ -170,6 +190,10 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
             onLoadStart={handleLoadStart}
             onLoadEnd={handleLoadEnd}
             onError={handleError}
+            onScroll={(e) => {
+              const y = e.nativeEvent.contentOffset.y;
+              setIsAtTop(y <= 0);
+            }}
             injectedJavaScript={injectedJavaScript}
             startInLoadingState={true}
             // renderLoading={() => (
@@ -196,7 +220,7 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
       </ScrollView>
 
       {/* Navigation Bar */}
-      <View style={styles.navigationBar}>
+      {/* <View style={styles.navigationBar}>
         <TouchableOpacity
           style={[styles.navButton, !canGoBack && styles.navButtonDisabled]}
           onPress={handleGoBack}
@@ -226,7 +250,7 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
             <Share2 size={24} color="#007AFF" />
           </TouchableOpacity>
         )}
-      </View>
+      </View> */}
     </View>
   );
 }

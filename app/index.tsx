@@ -12,7 +12,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchWebviewUrl();
-    
+
     const timer = setTimeout(() => {
       setShowSplashImage(false);
     }, 3000);
@@ -62,13 +62,15 @@ export default function HomeScreen() {
 
   if (showSplashImage) {
     return (
-      <View style={styles.fullScreenSplashContainer}>
+      <SafeAreaView style={styles.container}>
         <StatusBar style="light" />
-        <Image 
-          source={require('../assets/smarty-gym/splash screens/14-15-pro-max.jpg')} 
-          style={styles.fullScreenSplashImage} 
-        />
-      </View>
+        <View style={styles.fullScreenSplashContainer}>
+          <Image
+            source={require('../assets/smarty-gym/splash screens/14-15-pro-max.jpg')}
+            style={styles.fullScreenSplashImage}
+          />
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -124,7 +126,7 @@ const styles = StyleSheet.create({
   fullScreenSplashImage: {
     width: '100%',
     height: '100%',
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
 });
 
