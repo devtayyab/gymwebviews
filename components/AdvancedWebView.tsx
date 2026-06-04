@@ -170,15 +170,7 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            enabled={isAtTop}
-            tintColor="#007AFF"
-            colors={['#007AFF']}
-          />
-        }
+        bounces={false}
       >
         <View style={styles.webviewWrapper}>
           <WebView
