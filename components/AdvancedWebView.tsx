@@ -1,24 +1,17 @@
-import { useState, useRef, useCallback, useEffect } from 'react';
+import { CircleAlert as AlertCircle, RotateCw } from 'lucide-react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Animated,
+  BackHandler,
+  ScrollView,
+  Share,
   StyleSheet,
-  View,
-  ActivityIndicator,
   Text,
   TouchableOpacity,
-  RefreshControl,
-  ScrollView,
-  Platform,
-  Share,
-  BackHandler,
+  View
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import type { WebViewNavigation, WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
-import { ChevronLeft, ChevronRight, RotateCw, Share2, Hop as Home, CircleAlert as AlertCircle } from 'lucide-react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-} from 'react-native-reanimated';
 
 interface AdvancedWebViewProps {
   url: string;
@@ -51,11 +44,12 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
     return () => backHandler.remove();
   }, [canGoBack]);
 
-  const progress = useSharedValue(0);
+  const progress = useRef(new Animated.Value(0)).current;
 
-  const progressBarStyle = useAnimatedStyle(() => ({
-    width: `${progress.value * 100}%`,
-  }));
+  const progressWidth = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
 
   const handleNavigationStateChange = (navState: WebViewNavigation) => {
     setCanGoBack(navState.canGoBack);
@@ -64,20 +58,26 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
   };
 
   const handleLoadProgress = ({ nativeEvent }: WebViewProgressEvent) => {
-    progress.value = withTiming(nativeEvent.progress, { duration: 100 });
+    Animated.timing(progress, {
+      toValue: nativeEvent.progress,
+      duration: 100,
+      useNativeDriver: false,
+    }).start();
   };
 
   const handleLoadStart = () => {
     setIsLoading(true);
     setError(false);
-    progress.value = 0;
+    progress.setValue(0);
   };
 
   const handleLoadEnd = () => {
     setIsLoading(false);
-    progress.value = withTiming(1, { duration: 200 }, () => {
-      progress.value = 0;
-    });
+    Animated.timing(progress, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: false,
+    }).start(() => progress.setValue(0));
   };
 
   const handleError = () => {
@@ -164,8 +164,8 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
 
   return (
     <View style={styles.container}>
-      {progress.value > 0 && progress.value < 1 && (
-        <Animated.View style={[styles.progressBar, progressBarStyle]} />
+      {isLoading && (
+        <Animated.View style={[styles.progressBar, { width: progressWidth }]} />
       )}
 
       <ScrollView

@@ -1,100 +1,39 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, View, SafeAreaView, Platform, ActivityIndicator, Text, Image } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View, SafeAreaView, TouchableOpacity, Platform } from 'react-native';
+import { useRouter } from 'expo-router';
+import * as Haptics from 'expo-haptics';
+import { QrCode, Timer, Bell, Menu } from 'lucide-react-native';
 import AdvancedWebView from '@/components/AdvancedWebView';
-import Calculator from '@/components/Calculator';
+
+const WEBVIEW_URL = 'https://smartygym.com/';
 
 export default function HomeScreen() {
-  const [webviewUrl, setWebviewUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [showSplashImage, setShowSplashImage] = useState(true);
+  const router = useRouter();
 
-  useEffect(() => {
-    fetchWebviewUrl();
-
-    const timer = setTimeout(() => {
-      setShowSplashImage(false);
-    }, 3000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const fetchWebviewUrl = async () => {
-    try {
-      const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-      const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
-
-      console.log("SUPABASE_URL:", supabaseUrl);
-      console.log("SUPABASE_ANON_KEY:", supabaseKey ? "✅ Present" : "❌ MISSING");
-
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error("Supabase environment variables missing");
-      }
-
-      const apiUrl = `${supabaseUrl}/functions/v1/get-webview-url`;
-      console.log("Fetching from:", apiUrl);
-
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${supabaseKey}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-      console.log("Supabase Response:", data);
-
-      if (data.url) {
-        setWebviewUrl(data.url);
-      } else {
-        setWebviewUrl(null);
-      }
-    } catch (err: any) {
-      console.error('Error fetching webview URL:', err.message || err);
-      setError('Failed to fetch URL');
-      setWebviewUrl(null);
-    } finally {
-      setLoading(false);
-    }
+  const go = (path: '/checkin' | '/timer' | '/reminders' | '/more') => {
+    if (Platform.OS !== 'web') Haptics.selectionAsync().catch(() => {});
+    router.push(path);
   };
-
-  if (showSplashImage) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar style="light" />
-        <View style={styles.fullScreenSplashContainer}>
-          <Image
-            source={require('../assets/smarty-gym/splash screens/14-15-pro-max.jpg')}
-            style={styles.fullScreenSplashImage}
-          />
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar style="light" />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
+      <View style={styles.header}>
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.iconButton} onPress={() => go('/checkin')} hitSlop={8}>
+            <QrCode size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={() => go('/timer')} hitSlop={8}>
+            <Timer size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={() => go('/reminders')} hitSlop={8}>
+            <Bell size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.iconButton} onPress={() => go('/more')} hitSlop={8}>
+            <Menu size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
       <View style={styles.contentContainer}>
-        {webviewUrl ? (
-          <AdvancedWebView url={webviewUrl} />
-        ) : (
-          <Calculator />
-        )}
+        <AdvancedWebView url={WEBVIEW_URL} />
       </View>
     </SafeAreaView>
   );
@@ -106,27 +45,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     paddingTop: Platform.OS === 'android' ? 45 : 0,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+  },
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 18,
+  },
+  iconButton: {
+    padding: 2,
+  },
   contentContainer: {
     flex: 1,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: '#fff',
-  },
-  fullScreenSplashContainer: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  fullScreenSplashImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'cover',
-  },
 });
-

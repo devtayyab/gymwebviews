@@ -2,7 +2,7 @@
   "expo": {
     "name": "Smarty Gym",
     "slug": "smarty-gym-webview",
-    "version": "1.0.1",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/smarty-gym/icon/Icon_Padded.png",
     "scheme": "smartygym",
@@ -15,7 +15,11 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.smartygym.webview"
+      "bundleIdentifier": "com.smartygym.webview",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Smarty Gym uses the camera to scan your membership QR code for gym check-in.",
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.smartygym.webview",
@@ -28,14 +32,25 @@
       "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-router", "expo-font", "expo-web-browser"],
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Smarty Gym uses the camera to scan your membership QR code for gym check-in."
+        }
+      ],
+      "expo-notifications"
+    ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "fef2f56f-8552-4554-b03f-41312c343eb3"
+        "projectId": "e112ac56-3367-4cec-82c5-1a7ca059e05c"
       }
     }
   }
