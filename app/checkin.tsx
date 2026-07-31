@@ -80,7 +80,7 @@ export default function CheckInScreen() {
           Allow camera access to scan your membership QR code at the gym entrance.
         </Text>
         <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
-          <Text style={styles.primaryButtonText}>Enable Camera</Text>
+          <Text style={styles.primaryButtonText}>Continue</Text>
         </TouchableOpacity>
       </View>
     );

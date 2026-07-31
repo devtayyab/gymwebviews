@@ -17,7 +17,7 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.smartygym.webview",
       "infoPlist": {
-        "NSCameraUsageDescription": "Smarty Gym uses the camera to scan your membership QR code for gym check-in.",
+        "NSCameraUsageDescription": "Smarty Gym requires camera access to scan physical membership QR codes and barcodes at gym entry turnstiles to verify member access and check-in to workouts.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -39,7 +39,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Smarty Gym uses the camera to scan your membership QR code for gym check-in."
+          "cameraPermission": "Smarty Gym requires camera access to scan physical membership QR codes and barcodes at gym entry turnstiles to verify member access and check-in to workouts."
         }
       ],
       "expo-notifications"
