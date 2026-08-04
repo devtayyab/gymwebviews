@@ -42,11 +42,11 @@ export default function MoreScreen() {
   const handleDeleteAccount = () => {
     Alert.alert(
       'Delete Account',
-      'Are you sure you want to request account deletion? You will be directed to our secure account deletion portal.',
+      'This permanently deletes your Smarty Gym account and all data associated with it. This cannot be undone. You will be taken to the account deletion page to confirm.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Proceed',
+          text: 'Delete Account',
           style: 'destructive',
           onPress: () => openBrowser(DELETE_ACCOUNT),
         },

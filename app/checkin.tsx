@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Platform,
+  Linking,
 } from 'react-native';
 import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
 import * as Haptics from 'expo-haptics';
@@ -72,15 +73,22 @@ export default function CheckInScreen() {
   }
 
   if (!permission.granted) {
+    // Once the system prompt can no longer be shown, the only way back is Settings.
+    const mustUseSettings = !permission.canAskAgain;
     return (
       <View style={styles.center}>
         <CameraIcon size={64} color="#007AFF" />
         <Text style={styles.title}>Gym Check-In</Text>
         <Text style={styles.subtitle}>
-          Allow camera access to scan your membership QR code at the gym entrance.
+          {mustUseSettings
+            ? 'Camera access is turned off, so the QR scanner cannot read your membership code. You can turn it back on in Settings.'
+            : 'Scanning your membership QR code at the gym entrance uses the camera.'}
         </Text>
-        <TouchableOpacity style={styles.primaryButton} onPress={requestPermission}>
-          <Text style={styles.primaryButtonText}>Continue</Text>
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={mustUseSettings ? () => Linking.openSettings().catch(() => {}) : requestPermission}
+        >
+          <Text style={styles.primaryButtonText}>{mustUseSettings ? 'Open Settings' : 'Continue'}</Text>
         </TouchableOpacity>
       </View>
     );

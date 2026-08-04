@@ -39,7 +39,9 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Smarty Gym requires camera access to scan physical membership QR codes and barcodes at gym entry turnstiles to verify member access and check-in to workouts."
+          "cameraPermission": "Smarty Gym requires camera access to scan physical membership QR codes and barcodes at gym entry turnstiles to verify member access and check-in to workouts.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
         }
       ],
       "expo-notifications"
