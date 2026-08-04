@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Animated,
   BackHandler,
+  Linking,
   ScrollView,
   Share,
   StyleSheet,
@@ -11,7 +12,15 @@ import {
   View
 } from 'react-native';
 import { WebView } from 'react-native-webview';
-import type { WebViewNavigation, WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
+import type {
+  ShouldStartLoadRequest,
+  WebViewNavigation,
+  WebViewProgressEvent,
+} from 'react-native-webview/lib/WebViewTypes';
+
+// Schemes the WebView itself cannot load — hand them to the OS instead of
+// letting the page fail silently.
+const EXTERNAL_SCHEMES = ['mailto:', 'tel:', 'sms:', 'itms-apps:', 'maps:', 'whatsapp:'];
 
 interface AdvancedWebViewProps {
   url: string;
@@ -119,6 +128,19 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
     }
   };
 
+  const openExternally = (target: string) => {
+    Linking.openURL(target).catch(() => {});
+  };
+
+  const handleShouldStartLoad = (request: ShouldStartLoadRequest) => {
+    const target = request.url;
+    if (EXTERNAL_SCHEMES.some((scheme) => target.startsWith(scheme))) {
+      openExternally(target);
+      return false;
+    }
+    return true;
+  };
+
   const handleRetry = () => {
     setError(false);
     webViewRef.current?.reload();
@@ -182,6 +204,20 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
             onLoadStart={handleLoadStart}
             onLoadEnd={handleLoadEnd}
             onError={handleError}
+            onShouldStartLoadWithRequest={handleShouldStartLoad}
+            // target="_blank" links open no window in WKWebView; route them
+            // back into this WebView so they are not dead taps.
+            onOpenWindow={({ nativeEvent }) => {
+              const target = nativeEvent.targetUrl;
+              if (!target) return;
+              if (EXTERNAL_SCHEMES.some((scheme) => target.startsWith(scheme))) {
+                openExternally(target);
+                return;
+              }
+              webViewRef.current?.injectJavaScript(
+                `window.location.href = ${JSON.stringify(target)};`
+              );
+            }}
             onScroll={(e) => {
               const y = e.nativeEvent.contentOffset.y;
               setIsAtTop(y <= 0);
@@ -206,7 +242,6 @@ export default function AdvancedWebView({ url }: AdvancedWebViewProps) {
             sharedCookiesEnabled={true}
             allowsInlineMediaPlayback={true}
             mediaPlaybackRequiresUserAction={false}
-            userAgent="Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
           />
         </View>
       </ScrollView>

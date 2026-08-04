@@ -7,6 +7,7 @@ import {
   ScrollView,
   Platform,
   Alert,
+  Linking,
 } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import * as Haptics from 'expo-haptics';
@@ -62,7 +63,11 @@ export default function RemindersScreen() {
     if (!req.granted) {
       Alert.alert(
         'Notifications Disabled',
-        'Enable notifications in Settings to receive workout reminders.'
+        'Workout reminders cannot be delivered while notifications are off for Smarty Gym. You can turn them on in Settings.',
+        [
+          { text: 'Not Now', style: 'cancel' },
+          { text: 'Open Settings', onPress: () => Linking.openSettings().catch(() => {}) },
+        ]
       );
       return false;
     }

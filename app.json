@@ -15,6 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
+      "requireFullScreen": true,
       "bundleIdentifier": "com.smartygym.webview",
       "infoPlist": {
         "NSCameraUsageDescription": "Smarty Gym requires camera access to scan physical membership QR codes and barcodes at gym entry turnstiles to verify member access and check-in to workouts.",
